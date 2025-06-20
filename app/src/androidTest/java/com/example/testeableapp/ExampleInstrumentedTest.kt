@@ -89,4 +89,78 @@ class ExampleInstrumentedTest {
         composeTestRule.onNodeWithTag("numberOfPeople").assertExists()
         composeTestRule.onNodeWithTag("numberOfPeopleInput").assertExists()
     }
+
+    //    Test adicional 1: Validar input de total de personas
+    @Test
+    fun numberOfPeopleTest() {
+        composeTestRule.setContent {
+            TipCalculatorScreen()
+        }
+
+//    Establecer valor de propina
+        composeTestRule.onNodeWithTag("tipInput").performTextInput("100")
+
+//    Chequear valor inicial de personas
+        composeTestRule.onNodeWithTag("numberOfPeople").assertTextEquals("Número de personas: 1")
+
+//    Chequear valor de propina por persona: 100 + 15% de propina / 1 = 115.00
+        composeTestRule.onNodeWithTag("totalPerPersonValue")
+            .assertTextEquals("Total por persona: $115.00")
+
+//    Incrementar número de personas (Click en boton +)
+        composeTestRule.onNodeWithTag("incrementPeopleButton").performClick()
+
+//    Chequear nuevo valor de personas
+        composeTestRule.onNodeWithTag("numberOfPeople").assertTextEquals("Número de personas: 2")
+
+//    Chequear nuevo valor de propina por persona: 100 + 15% de propina / 2 = 57.50
+        composeTestRule.onNodeWithTag("totalPerPersonValue")
+            .assertTextEquals("Total por persona: $57.50")
+
+//    Decrementar número de personas (Click en boton -)
+        composeTestRule.onNodeWithTag("decrementPeopleButton").performClick()
+
+//    Chequear nuevo valor de personas
+        composeTestRule.onNodeWithTag("numberOfPeople").assertTextEquals("Número de personas: 1")
+
+//    Chequear nuevamente valor de propina
+        composeTestRule.onNodeWithTag("totalPerPersonValue")
+            .assertTextEquals("Total por persona: $115.00")
+    }
+
+    //    Test adicional 2: Combinar numero de personas, slider de porcentaje y redondeo
+    @Test
+    fun allInputsCombinedTest() {
+        composeTestRule.setContent {
+            TipCalculatorScreen()
+        }
+
+//    Establecer valor de propina
+        composeTestRule.onNodeWithTag("tipInput").performTextInput("86")
+
+//    Establecer valor de slider a: 25%
+        composeTestRule.onNodeWithTag("tipSlider")
+            .performSemanticsAction(SemanticsActions.SetProgress) { it(25f) }
+
+//    Chequear nuevo valor de propina por persona: 86 + 25% de propina / 1 = 107.50
+        composeTestRule.onNodeWithTag("totalPerPersonValue")
+            .assertTextEquals("Total por persona: $107.50")
+
+//    Incrementar número de personas (Click en boton +)
+        composeTestRule.onNodeWithTag("incrementPeopleButton").performClick()
+
+//    Chequear nuevo valor de personas
+        composeTestRule.onNodeWithTag("numberOfPeople").assertTextEquals("Número de personas: 2")
+
+//    Chequear nuevo valor de propina por persona: 86 + 25% de propina / 2 = 53.75
+        composeTestRule.onNodeWithTag("totalPerPersonValue")
+            .assertTextEquals("Total por persona: $53.75")
+
+//      Click en checkbox para redondear
+        composeTestRule.onNodeWithTag("roundUpCheckbox").performClick()
+
+//      Chequear nuevo valor de propina por persona redondeado
+        composeTestRule.onNodeWithTag("totalPerPersonValue")
+            .assertTextEquals("Total por persona: $54.00")
+    }
 }
